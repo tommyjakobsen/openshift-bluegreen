@@ -9,40 +9,40 @@ node {
   def active   = ""
   def newcolor = ""
 
-  stage('Determine Deployment color') {
-    switch (BUILD_NUMBER.toInteger() % 10) {
-      case 1:
-          newcolor="red"
-          break
-      case 2:
-          newcolor="blue"
-          break
-      case 3:
-          newcolor="yellow"
-          break
-      case 4:
-          newcolor="green"
-          break
-      case 5:
-          newcolor="purple"
-          break
-      case 6:
-          newcolor="orange"
-          break
-      case 7:
-          newcolor="cyan"
-          break
-      case 8:
-          newcolor="navy"
-          break
-      case 9:
-          newcolor="white"
-          break
-      case 0:
-          newcolor="maroon"
-          break
-    }
+  switch (BUILD_NUMBER.toInteger() % 10) {
+    case 1:
+        newcolor="red"
+        break
+    case 2:
+        newcolor="blue"
+        break
+    case 3:
+        newcolor="yellow"
+        break
+    case 4:
+        newcolor="green"
+        break
+    case 5:
+        newcolor="purple"
+        break
+    case 6:
+        newcolor="orange"
+        break
+    case 7:
+        newcolor="cyan"
+        break
+    case 8:
+        newcolor="navy"
+        break
+    case 9:
+        newcolor="white"
+        break
+    case 0:
+        newcolor="maroon"
+        break
+  }
 
+  stage('Determine Deployment color') {
     sh "oc project bluegreen"
     sh "oc get route example -n bluegreen -o jsonpath='{ .spec.to.name }' > activesvc.txt"
     active = readFile('activesvc.txt').trim()
