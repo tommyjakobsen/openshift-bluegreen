@@ -34,3 +34,4 @@ oc create -f https://raw.githubusercontent.com/wkulhanek/openshift-bluegreen/mas
 * Since the deployment is triggered by the pipeline we turn off all triggers from our deployment configurations. This way the pipeline can control exactly what gets deployed when.
 * The green application is exposed through a route.
 * Finally we create the Pipeline Build Configuration in OpenShift.
+* The pipeline has a list of 10 colors that get picked in sequence. So every build gets a new color - until the 11th time the pipeline runs - then it starts over.
