@@ -51,7 +51,7 @@ node {
     }
     echo "Active svc: " + active
     echo "Dest svc:   " + dest
-    echo "New color:  " = newcolor
+    echo "New color:  " + newcolor
   }
 
   stage('Build new version') {
