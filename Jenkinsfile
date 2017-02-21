@@ -6,9 +6,12 @@ node {
   // -------------------------------------
   def dest   = "example-green"
   def active = ""
+  def newcolor = ""
 
-  if ("${COLOR}" == "") {
-    COLOR="purple"
+  try {
+    newcolor = ${COLOR}
+  } catch(error) {
+    newcolor="purple"
   }
 
   stage('Determine Deployment Color') {
@@ -45,4 +48,3 @@ node {
     echo "Current route configuration: " + oc_out
   }
 }
-
