@@ -8,9 +8,10 @@ node {
   def active   = ""
   def newcolor = "purple"
 
-  try {
+  if (getBinding().hasVariable("COLOR")) {
     newcolor = ${COLOR}
-  } catch(error) {
+  }
+  else {
     echo "No parameter for color."
   }
   sh "oc project bluegreen"
