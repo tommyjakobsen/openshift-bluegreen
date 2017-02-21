@@ -35,7 +35,7 @@ node {
         newcolor="navy"
         break
     case 9:
-        newcolor="white"
+        newcolor="magenta"
         break
     case 0:
         newcolor="maroon"
