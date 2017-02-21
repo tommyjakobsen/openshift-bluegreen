@@ -25,10 +25,12 @@ oc new-app openshift/deployment-example:v2 --name=example-blue
 oc set triggers dc/example-green --remove-all
 oc set triggers dc/example-blue --remove-all
 oc expose svc/example-green --name=example
+oc create -f https://raw.githubusercontent.com/wkulhanek/openshift-bluegreen/master/example-pipeline.yaml
 ----
 
 * First we create a new project (*bluegreen*).
 * In this project we create a Jenkins instance with persistent storage. Technically this would not be necessary - OpenShift would launch an ephemeral version of Jenkins every time a pipeline is run - but that's quite inefficient when running a pipeline multiple times.
 * We create two versions of the same application. One named *example-green* and one named *example-blue*. Also one prints *v1* on the web page while the other prints *v2*.
 * Since the deployment is triggered by the pipeline we turn off all triggers from our deployment configurations. This way the pipeline can control exactly what gets deployed when.
-* And finally we expose the green application through a route.
+* The green application is exposed through a route.
+* Finally we create the Pipeline Build Configuration in OpenShift.
