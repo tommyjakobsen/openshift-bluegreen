@@ -4,18 +4,18 @@
 node {
   // Blue/Green Deployment into Production
   // -------------------------------------
-  def dest   = "example-green"
-  def active = ""
-  def newcolor = ""
+  def dest     = "example-green"
+  def active   = ""
+  def newcolor = "purple"
 
   try {
     newcolor = ${COLOR}
   } catch(error) {
-    newcolor="purple"
+    echo "No parameter for color."
   }
+  sh "oc project bluegreen"
 
   stage('Determine Deployment Color') {
-    sh "oc project bluegreen"
     sh "oc get route example -n bluegreen -o jsonpath='{ .spec.to.name }' > activesvc.txt"
     active = readFile('activesvc.txt').trim()
     if (active == "example-green") {
@@ -29,7 +29,6 @@ node {
     // Building in this case means simply changing the environment variable COLOR in the deployment configuration.
     // There is not Build Configuration since this is a straight up Docker Image deployment.
     echo "Building ${dest}"
-    sh "oc project bluegreen"
     sh "oc set env dc ${dest} COLOR=${newcolor}"
   }
 
