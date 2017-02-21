@@ -1,6 +1,6 @@
 # OpenShift Blue/Green Pipeline Demo
 
-This demo sets up a pipeline within OpenShift that can be shows how to do a Blue/Green Deployment into a production OpenShift environment.
+This demo sets up a pipeline within OpenShift that shows how to do a Blue/Green Deployment into a production OpenShift environment.
 
 It uses a very simple container from DockerHub that simply draws a square in a given color and with a given text. The color can be set through a parameter.
 
