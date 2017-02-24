@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 node {
   // Blue/Green Deployment into Production
   // -------------------------------------
+  def project  = ""
   def dest     = "example-green"
   def active   = ""
   def newcolor = ""
@@ -43,8 +44,11 @@ node {
   }
 
   stage('Determine Deployment color') {
-//    sh "oc project bluegreen"
-    sh "oc get route example -n bluegreen -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+    // Determine current project
+    sh "oc get project|grep -v "NAME"|awk '{print$1}' >project.txt"
+    project = readFile('project.txt').trim()
+//    sh "oc project ${project}"
+    sh "oc get route example -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
     active = readFile('activesvc.txt').trim()
     if (active == "example-green") {
       dest = "example-blue"
@@ -65,14 +69,14 @@ node {
   stage('Deploy new Version') {
     echo "Deploying to ${dest}"
 
-    openshiftDeploy depCfg: dest, namespace: 'bluegreen', verbose: 'false', waitTime: '', waitUnit: 'sec'
-    openshiftVerifyDeployment depCfg: dest, namespace: 'bluegreen', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
-    openshiftVerifyService namespace: 'bluegreen', svcName: dest, verbose: 'false'
+    openshiftDeploy depCfg: dest, namespace: project, verbose: 'false', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyDeployment depCfg: dest, namespace: project, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyService namespace: project, svcName: dest, verbose: 'false'
   }
   stage('Switch over to new Version') {
     input "Switch Production?"
-    sh 'oc patch route example -n bluegreen -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc get route example -n bluegreen > oc_out.txt'
+    sh 'oc patch route example -n ${project} -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc get route example -n ${project} > oc_out.txt'
     oc_out = readFile('oc_out.txt')
     echo "Current route configuration: " + oc_out
   }
