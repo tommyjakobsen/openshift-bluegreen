@@ -47,8 +47,9 @@ node {
     // Determine current project
     sh "oc get project|grep -v NAME|awk '{print \$1}' >project.txt"
     project = readFile('project.txt').trim()
-//    sh "oc project ${project}"
     sh "oc get route example -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+
+    // Determine currently active Service
     active = readFile('activesvc.txt').trim()
     if (active == "example-green") {
       dest = "example-blue"
@@ -59,10 +60,11 @@ node {
   }
 
   stage('Build new version') {
-    // Building in this case means simply changing the environment variable newcolor in the deployment configuration.
-    // There is not Build Configuration since this is a straight up Docker Image deployment.
+    // Building in this case means simply changing the environment
+    // variable newcolor in the deployment configuration.
+    // There is not Build Configuration since this is a straight
+    // up Docker Image deployment.
     echo "Building ${dest}"
-//    sh "oc project bluegreen"
     sh "oc set env dc ${dest} newcolor=${newcolor}"
   }
 
