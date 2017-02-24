@@ -43,7 +43,7 @@ node {
   }
 
   stage('Determine Deployment color') {
-    sh "oc project bluegreen"
+//    sh "oc project bluegreen"
     sh "oc get route example -n bluegreen -o jsonpath='{ .spec.to.name }' > activesvc.txt"
     active = readFile('activesvc.txt').trim()
     if (active == "example-green") {
@@ -58,7 +58,7 @@ node {
     // Building in this case means simply changing the environment variable newcolor in the deployment configuration.
     // There is not Build Configuration since this is a straight up Docker Image deployment.
     echo "Building ${dest}"
-    sh "oc project bluegreen"
+//    sh "oc project bluegreen"
     sh "oc set env dc ${dest} newcolor=${newcolor}"
   }
 
