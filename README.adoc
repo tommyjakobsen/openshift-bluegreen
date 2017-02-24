@@ -1,8 +1,10 @@
-# OpenShift Blue/Green Pipeline Demo
+= OpenShift Blue/Green Pipeline Demo
+
+== Overview
 
 This demo sets up a pipeline within OpenShift that shows how to do a Blue/Green Deployment into a production OpenShift environment.
 
-It uses a very simple container from DockerHub that simply draws a square in a given color and with a given text. The color can be set through a parameter.
+It uses a very simple container from DockerHub that draws a square in a given color and with a given text. The color can be set through a parameter.
 
 To deploy in a Blue/Green fashion we are following the *Two Services/One Route* approach. Note that this is just of many possible approaches to Blue/Green deployment - but it *is* the simplest one to set up. We have two deployment configurations that are running at all times. Both expose the application as a service. There is *one* route that points to the currently active service.
 
@@ -14,11 +16,13 @@ The Blue/Green deployment happens as follows:
 * Stop the Pipeline and ask for permission to switch the route over. This requires manual input. It would also be possible to do this automatically based on various tests of the newly deployed application.
 * When the user approves the switch, go ahead and switch the route from the previous service to the newly deployed/updated service with no service interruption.
 
-To set this demo up use the following commands:
+== Setup
+
+To set this demo up use the following commands (replace *xyz* with your initials):
 
 [source,bash]
 ----
-oc new-project bluegreen
+oc new-project xyz-bluegreen --display-name="Blue/Green Deployment Pipeline Demo"
 oc new-app jenkins-persistent --param MEMORY_LIMIT=1Gi --param VOLUME_CAPACITY=2Gi
 oc new-app openshift/deployment-example:v1 --name=example-green
 oc new-app openshift/deployment-example:v2 --name=example-blue
@@ -28,10 +32,34 @@ oc expose svc/example-green --name=example
 oc create -f https://raw.githubusercontent.com/wkulhanek/openshift-bluegreen/master/example-pipeline.yaml
 ----
 
+When running on OpenShift 3.3 and earlier set the Jenkins Password for user *admin*:
+[source,bash]
+----
+oc env dc/jenkins JENKINS_PASSWORD=admin123
+----
+[NOTE]
+On OpenShift 3.4 and later Jenkins uses OAUTH authentication into the OpenShift authentication plugin. Use your regular OpenShift UserID and Password to log into Jenkins.
+
 * First we create a new project (*bluegreen*).
 * In this project we create a Jenkins instance with persistent storage. Technically this would not be necessary - OpenShift would launch an ephemeral version of Jenkins every time a pipeline is run - but that's quite inefficient when running a pipeline multiple times.
 * We create two versions of the same application. One named *example-green* and one named *example-blue*. Also one prints *v1* on the web page while the other prints *v2*.
 * Since the deployment is triggered by the pipeline we turn off all triggers from our deployment configurations. This way the pipeline can control exactly what gets deployed when.
 * The green application is exposed through a route.
 * Finally we create the Pipeline Build Configuration in OpenShift.
+
+== Running the Demo
+
+* In the Web Console navigate to your project.
+* Verify that your blue/green route is working properly by clicking the link of your route.
+** You should see a Blue Square with text *v1*
+* Select *Builds/Pipelines* in the navigator on the left.
+** You will see your Pipeline configuration. It points to a Jenkinsfile in Github.
+** Click *Start Pipeline* to kick off a new build.
+** The build will progress until it is time to approve switching over to the new version of the application.
+** At this point you can verify that even though we deployed a new version of the application in the other deployment configuration our route still displays the blue *v1* text.
+** Back in your pipeline click the "Input Required" link. You will be directed to the Jenkins Login Page. On OpenShift 3.3 and earlier use *admin* as the user id and *admin123* as the password. On OpenShift 3.4 and later log in with your OpenShift credentials.
+** Click *Proceed* to continue the deployment of the new application version.
+** Refresh the Route to see the updated application. The first time you will see a light green box with text *v2*.
+* Every time you run the pipeline the color will change and the text will alternate between *v1* and *v2*.
 * The pipeline has a list of 10 colors that get picked in sequence. So every build gets a new color - until the 11th time the pipeline runs - then it starts over.
+* Run the pipeline again to see the next color.
