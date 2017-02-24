@@ -15,13 +15,13 @@ node {
         newcolor="red"
         break
     case 2:
-        newcolor="blue"
+        newcolor="maroon"
         break
     case 3:
         newcolor="yellow"
         break
     case 4:
-        newcolor="green"
+        newcolor="magenta"
         break
     case 5:
         newcolor="purple"
@@ -36,10 +36,10 @@ node {
         newcolor="navy"
         break
     case 9:
-        newcolor="magenta"
+        newcolor="green"
         break
     case 0:
-        newcolor="maroon"
+        newcolor="blue"
         break
   }
 
