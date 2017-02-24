@@ -75,8 +75,8 @@ node {
   }
   stage('Switch over to new Version') {
     input "Switch Production?"
-    sh 'oc patch route example -n ${project} -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc get route example -n ${project} > oc_out.txt'
+    sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc get route example > oc_out.txt'
     oc_out = readFile('oc_out.txt')
     echo "Current route configuration: " + oc_out
   }
