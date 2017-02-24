@@ -65,7 +65,7 @@ node {
     // There is not Build Configuration since this is a straight
     // up Docker Image deployment.
     echo "Building ${dest}"
-    sh "oc set env dc ${dest} color=${newcolor}"
+    sh "oc set env dc ${dest} COLOR=${newcolor}"
   }
 
   stage('Deploy new Version') {
