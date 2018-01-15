@@ -6,7 +6,7 @@ This demo sets up a pipeline within OpenShift that shows how to do a Blue/Green 
 
 It uses a very simple container from DockerHub that draws a square in a given color and with a given text. The color can be set through a parameter.
 
-To deploy in a Blue/Green fashion we are following the *Two Services/One Route* approach. Note that this is just of many possible approaches to Blue/Green deployment - but it *is* the simplest one to set up. We have two deployment configurations that are running at all times. Both expose the application as a service. There is *one* route that points to the currently active service.
+To deploy in a Blue/Green fashion we are following the *Two Services/One Production Route* approach. Note that this is just of many possible approaches to Blue/Green deployment - but it *is* the simplest one to set up. We have two deployment configurations that are running at all times. Both expose the application as a service. There is *one* route that points to the currently active service.
 
 The Blue/Green deployment happens as follows:
 
@@ -14,6 +14,7 @@ The Blue/Green deployment happens as follows:
 * Deploy the *other* application with the latest code (or in our case environment variable)
 * Typically there would be some acceptance tests at this point - for sake of simplicity these are omitted in this demo
 * Stop the Pipeline and ask for permission to switch the route over. This requires manual input. It would also be possible to do this automatically based on various tests of the newly deployed application.
+The new code is deployed currently to the devops service. So the Operators/developers can test the new version through this service. If everything is ok, they can switch the services, so production(example) is routed to the new version and devops is routed to the old versions (for new deployments).
 * When the user approves the switch, go ahead and switch the route from the previous service to the newly deployed/updated service with no service interruption.
 
 == Setup
@@ -22,14 +23,16 @@ To set this demo up use the following commands (replace *xyz* with your initials
 
 [source,bash]
 ----
-oc new-project xyz-bluegreen --display-name="Blue/Green Deployment Pipeline Demo"
-oc new-app jenkins-persistent --param MEMORY_LIMIT=1Gi --param VOLUME_CAPACITY=2Gi
+oc login https://<openshift node/minishift/origin>:8443 --token=<token>
+oc new-project telenor1-bluegreen --display-name="Telenor Blue/Green Deployment Pipeline Demo"
+oc new-app openshift/jenkins-ephemeral
 oc new-app openshift/deployment-example:v1 --name=example-green
 oc new-app openshift/deployment-example:v2 --name=example-blue
 oc set triggers dc/example-green --remove-all
 oc set triggers dc/example-blue --remove-all
 oc expose svc/example-green --name=example
-oc create -f https://raw.githubusercontent.com/wkulhanek/openshift-bluegreen/master/example-pipeline.yaml
+oc expose svc/example-blue --name=devops
+oc create -f https://raw.githubusercontent.com/tommyjakobsen/openshift-bluegreen/master/example-pipeline.yaml
 ----
 
 When running on OpenShift 3.3 and earlier set the Jenkins Password for user *admin*:
