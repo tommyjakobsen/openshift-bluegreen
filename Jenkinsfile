@@ -89,7 +89,7 @@ node {
     
    
   }
-  stage('Switch over to new Version') {
+  stage('Roll back to old Version') {
     input "Rollback?"
     sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
