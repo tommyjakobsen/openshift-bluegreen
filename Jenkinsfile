@@ -81,11 +81,13 @@ node {
     sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
     sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc get route example > oc_out.txt'
+    sh 'oc get route devops > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
-    echo "Verify Production"
-    echo "Current route configuration: " + oc_out
+    oc_out2 = readFile('oc_out2.txt')
+    echo "Current route configuration example: " + oc_out
+     echo "Current route configuration devops: " + oc_out
     
-    //Turn previous active to dev destinationb
+   
   }
  
 }
