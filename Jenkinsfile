@@ -53,6 +53,7 @@ node {
     active = readFile('activesvc.txt').trim()
     if (active == "example-green") {
       dest = "example-blue"
+     
     }
     echo "Active svc: " + active
     echo "Dest svc:   " + dest
@@ -78,6 +79,7 @@ node {
   stage('Switch over to new Version') {
     input "Switch Production?"
     sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc get route example > oc_out.txt'
     oc_out = readFile('oc_out.txt')
     echo "Verify Production"
