@@ -80,6 +80,10 @@ node {
     sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
     sh 'oc get route example > oc_out.txt'
     oc_out = readFile('oc_out.txt')
+    echo "Verify Production"
     echo "Current route configuration: " + oc_out
+    
+    //Turn previous active to dev destinationb
   }
+ 
 }
