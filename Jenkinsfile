@@ -6,7 +6,7 @@ node {
   // Blue/Green Deployment into Production
   // -------------------------------------
   def project  = ""
-  def dest     = "production-green"
+  def dest     = "example-green"
   def active   = ""
   def newcolor = ""
 
@@ -47,12 +47,12 @@ node {
     // Determine current project
     sh "oc get project|grep -v NAME|awk '{print \$1}' >project.txt"
     project = readFile('project.txt').trim()
-    sh "oc get route production -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+    sh "oc get route example -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
 
     // Determine currently active Service
     active = readFile('activesvc.txt').trim()
-    if (active == "production-green") {
-      dest = "production-blue"
+    if (active == "example-green") {
+      dest = "example-blue"
      
     }
     echo "Active svc: " + active
@@ -78,9 +78,9 @@ node {
   }
   stage('Switch over to new Version') {
     input "Switch Production?"
-    sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
     sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc get route production > oc_out.txt'
+    sh 'oc get route example > oc_out.txt'
     sh 'oc get route devops > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
     oc_out2 = readFile('oc_out2.txt')
@@ -91,13 +91,13 @@ node {
   }
   stage('Roll back to old Version') {
     input "Rollback?"
-    sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
     sh 'oc get route devops > oc_out.txt'
-    sh 'oc get route production > oc_out2.txt'
+    sh 'oc get route example > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
     oc_out2 = readFile('oc_out2.txt')
-    echo "Current route configuration production: " + oc_out2
+    echo "Current route configuration Production: " + oc_out2
      echo "Current route configuration devops: " + oc_out
     
    
