@@ -102,5 +102,11 @@ node {
     
    
   }
+   stage('Hybrid Deploy') {
+    input "Dep. hybrid to " + hybriddest + "?"
+   echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
+    
+   
+  }
  
 }
