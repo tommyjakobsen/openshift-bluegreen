@@ -18,3 +18,21 @@ items:
       value: yellow
 kind: List
 metadata: []
+- kind: "BuildConfig"
+  apiVersion: "v1"
+  metadata:
+    name: "bluegreen-pipeline"
+  spec:
+    source:
+      type: "Git"
+      git:
+        uri: "http://github.com/tommyjakobsen/openshift-bluegreen"
+    strategy:
+      type: "JenkinsPipeline"
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: Jenkinsfile
+    env:
+    - name: COLOR
+      value: yellow
+kind: List
+metadata: []
