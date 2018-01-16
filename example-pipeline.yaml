@@ -3,6 +3,10 @@ items:
 - kind: "BuildConfig"
   apiVersion: "v1"
   metadata:
+    annotations:
+    description: This example showcases a blue green deployment using a Jenkins pipeline that pauses for approval, and approval for switch into production.
+    iconClass: icon-jenkins
+    tags: instant-app,jenkins
     name: "bluegreen-pipeline"
   spec:
     source:
