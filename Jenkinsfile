@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 node {
   // Blue/Green Deployment into Production
   // -------------------------------------
-  sh "oc login ${localdest} --token=${localtoken}"
+  
   def project  = ""
   def dest     = "example-green"
   def active   = ""
@@ -111,6 +111,7 @@ node {
      sh "oc new-app https://github.com/tommyjakobsen/simple-php --name=public-app"
      sh "oc set triggers dc/public-app --remove-all"
      sh "oc expose svc/public-app --name=public"
+     sh "oc logout"
 
    
   }
