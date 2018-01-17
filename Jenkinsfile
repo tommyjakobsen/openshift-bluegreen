@@ -104,8 +104,11 @@ node {
   //}
    stage('Hybrid Deploy') {
     input "Dep. hybrid to " + hybriddest + "?"
-   echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
-    
+    echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
+    oc new-app https://github.com/tommyjakobsen/simple-php --name=public-app
+    oc set triggers dc/public-app --remove-all
+    oc expose svc/public-app --name=public
+
    
   }
  
