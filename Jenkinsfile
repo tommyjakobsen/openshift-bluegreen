@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 node {
   // Blue/Green Deployment into Production
   // -------------------------------------
-    sh "oc login ${localdest} --token=${localtoken}"
+  sh "oc login ${localdest} --token=${localtoken}"
   def project  = ""
   def dest     = "example-green"
   def active   = ""
