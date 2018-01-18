@@ -13,7 +13,7 @@ node {
 
   switch (BUILD_NUMBER.toInteger() % 10) {
     case 1:
-        newcolor="green"
+        newcolor="red"
         break
     case 2:
         newcolor="maroon"
