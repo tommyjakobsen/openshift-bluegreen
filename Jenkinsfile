@@ -107,7 +107,7 @@ node {
     input "Dep. hybrid to " + hybriddest + "?"
     echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
     echo "oc login " +hybriddest+" --token="+hybridtoken
-     sh "oc login ${hybriddest} --token=${hybridtoken}"
+     sh "oc login ${hybriddest} --token=${hybridtoken}" --insecure-skip-tls-verify=true
      sh "oc new-app https://github.com/tommyjakobsen/simple-php --name=public-app"
      sh "oc set triggers dc/public-app --remove-all"
      sh "oc expose svc/public-app --name=public"
