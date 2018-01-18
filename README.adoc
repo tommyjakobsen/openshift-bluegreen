@@ -23,8 +23,8 @@ To set this demo up use the following commands (replace *xyz* with your initials
 
 [source,bash]
 ----
-oc login https://<openshift node/minishift/origin>:8443 --token=<token>
-oc new-project telenor1-bluegreen --display-name="Telenor Blue/Green Deployment Pipeline Demo"
+oc login https://<oc host>:8443 --token=<token>
+oc new-project telenor1-bluegreen --display-name="<name>"
 oc new-app openshift/jenkins-ephemeral
 oc new-app openshift/deployment-example:v1 --name=example-green
 oc new-app openshift/deployment-example:v2 --name=example-blue
@@ -32,6 +32,8 @@ oc set triggers dc/example-green --remove-all
 oc set triggers dc/example-blue --remove-all
 oc expose svc/example-green --name=example
 oc expose svc/example-blue --name=devops
+oc env dc --all hybridtoken=<token for external/public oc>
+oc env dc --all hybriddest=https://<external oc host>
 oc create -f https://raw.githubusercontent.com/tommyjakobsen/openshift-bluegreen/master/example-pipeline.yaml
 ----
 
