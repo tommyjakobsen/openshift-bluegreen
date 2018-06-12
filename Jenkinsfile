@@ -90,30 +90,30 @@ node {
     
    
   }
-  //stage('Roll back to old Version') {
-   // input "Rollback?"
-   // sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-   // sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-   // sh 'oc get route devops > oc_out.txt'
-   // sh 'oc get route example > oc_out2.txt'
-   // oc_out = readFile('oc_out.txt')
-   // oc_out2 = readFile('oc_out2.txt')
-   // echo "Current route configuration Production: " + oc_out2
-   //  echo "Current route configuration devops: " + oc_out
+  stage('Roll back to old Version') {
+    input "Rollback?"
+   sh 'oc patch route example -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc get route devops > oc_out.txt'
+    sh 'oc get route example > oc_out2.txt'
+    oc_out = readFile('oc_out.txt')
+    oc_out2 = readFile('oc_out2.txt')
+    echo "Current route configuration Production: " + oc_out2
+     echo "Current route configuration devops: " + oc_out
     
    
-  //}
-   stage('Hybrid Deploy') {
-    input "Dep. hybrid to " + hybriddest + "?"
-    echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
-    echo "oc login " +hybriddest+" --token="+hybridtoken
-     sh "oc login ${hybriddest} --token=${hybridtoken} --insecure-skip-tls-verify=true"
-     sh "oc new-app https://github.com/tommyjakobsen/simple-php --name=public-app"
-     sh "oc set triggers dc/public-app --remove-all"
-     sh "oc expose svc/public-app --name=public"
-     sh "oc logout"
+  }
+  // stage('Hybrid Deploy') {
+   // input "Dep. hybrid to " + hybriddest + "?"
+   // echo "Deploying to :" +hybriddest + " with token:" + hybridtoken+"....."
+    //echo "oc login " +hybriddest+" --token="+hybridtoken
+     //sh "oc login ${hybriddest} --token=${hybridtoken} --insecure-skip-tls-verify=true"
+     //sh "oc new-app https://github.com/tommyjakobsen/simple-php --name=public-app"
+     //sh "oc set triggers dc/public-app --remove-all"
+     //sh "oc expose svc/public-app --name=public"
+     //sh "oc logout"
 
    
-  }
+  //}
  
 }
