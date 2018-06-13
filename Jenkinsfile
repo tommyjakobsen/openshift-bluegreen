@@ -97,7 +97,7 @@ node {
   }
   
   
-  if (input == "")
+  if (rollback == "")
   {
     sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
