@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 node {
   // Blue/Green Deployment into Production
   // -------------------------------------
-  def rollback = ""
+  //def rollback = ""
   def project  = ""
   def dest     = "production"
   def active   = ""
