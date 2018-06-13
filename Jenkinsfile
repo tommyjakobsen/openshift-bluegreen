@@ -91,14 +91,12 @@ node {
    
   }
   stage('Keep new version?') {
-    input {
-                message "Keep the new Version?"
-                ok "yes"
-                submitter "Deployment pipeline"
-                parameters {
-                    string(name: 'rollback', defaultValue: 'no', description: 'determin rollback')
-                }
-            }
+    choice{
+           choices: 'yes\no',
+           defaultValue: 'box', 
+           description:  'descision about keeping new version in production',
+           name: 'rollback'
+         }
     steps{
         
         if (rollback == "")
