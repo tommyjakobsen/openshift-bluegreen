@@ -91,14 +91,12 @@ node {
    
   }
   stage('Keep new version?') {
-    choice{
-           choices: 'yes\no',
-           defaultValue: 'box', 
-           description:  'descision about keeping new version in production',
-           name: 'rollback'
-         }
-    steps{
-        
+    input{
+      def rollback = input(message: 'Do you want to roll back to previous version?', ok: 'Yes', 
+                        parameters: [booleanParam(defaultValue: true, 
+                        description: 'Push the button for rollback',name: 'Yes?')])
+    }
+        echo "ROLLBACK = " + rollback + "\n\n"
         if (rollback == "")
           {
             sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
