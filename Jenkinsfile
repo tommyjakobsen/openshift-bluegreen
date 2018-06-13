@@ -90,16 +90,27 @@ node {
     
    
   }
-  stage('Keep new version?') {
-    input{
-      def rollback = input(message: 'Do you want to roll back to previous version?', ok: 'Yes', 
-                        parameters: [booleanParam(defaultValue: true, 
-                        description: 'Push the button for rollback',name: 'Yes?')])
-    }
-        echo "ROLLBACK = " + rollback + "\n\n"
-        if (rollback == "")
-          {
-            sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+  stage('Keep version?') {
+  def userInput
+try {
+    userInput = input(
+        id: 'Proceed1', message: 'Was this successful?', parameters: [
+        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
+        ])
+} catch(err) { // input false
+    def user = err.getCauses()[0].getUser()
+    userInput = false
+    echo "Aborted...."
+}
+
+node {
+    if (userInput == true) {
+        // do something
+        echo "Deployment was successful"
+    } else {
+        // do something else
+        echo "Rollback initiated"
+       sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
             sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
             sh 'oc get route devops > oc_out.txt'
             sh 'oc get route production > oc_out2.txt'
@@ -107,7 +118,9 @@ node {
             oc_out2 = readFile('oc_out2.txt')
             echo "Current route configuration Production: " + oc_out2
             echo "Current route configuration devops: " + oc_out
-          }
+        currentBuild.result = 'FAILURE'
+    } 
+}
       
 }
    
