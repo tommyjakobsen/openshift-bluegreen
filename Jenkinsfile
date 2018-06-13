@@ -91,23 +91,33 @@ node {
    
   }
   stage('Keep new version?') {
-    input "Keep new version?"
-   rollback="yes" 
+    input {
+                message "Keep the new Version?"
+                ok "yes"
+                submitter "Deployment pipeline"
+                parameters {
+                    string(name: 'rollback', defaultValue: 'no', description: 'determin rollback')
+                }
+            }
+    steps{
+        
+        if (rollback == "")
+          {
+            sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+            sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+            sh 'oc get route devops > oc_out.txt'
+            sh 'oc get route production > oc_out2.txt'
+            oc_out = readFile('oc_out.txt')
+            oc_out2 = readFile('oc_out2.txt')
+            echo "Current route configuration Production: " + oc_out2
+            echo "Current route configuration devops: " + oc_out
+          }
+      
+    }
    
   }
   
   
-  if (rollback == "")
-  {
-    sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc get route devops > oc_out.txt'
-    sh 'oc get route production > oc_out2.txt'
-    oc_out = readFile('oc_out.txt')
-    oc_out2 = readFile('oc_out2.txt')
-    echo "Current route configuration Production: " + oc_out2
-     echo "Current route configuration devops: " + oc_out
-  }
     
     
   // stage('Hybrid Deploy') {
