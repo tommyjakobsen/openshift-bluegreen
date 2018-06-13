@@ -109,9 +109,9 @@ node {
             echo "Current route configuration devops: " + oc_out
           }
       
-    }
+}
    
-  }
+  
   
   
     
