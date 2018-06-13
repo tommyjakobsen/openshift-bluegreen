@@ -7,7 +7,7 @@ node {
   // -------------------------------------
   def rollback = ""
   def project  = ""
-  def dest     = "example-green"
+  def dest     = "production"
   def active   = ""
   def newcolor = ""
 
@@ -52,8 +52,8 @@ node {
 
     // Determine currently active Service
     active = readFile('activesvc.txt').trim()
-    if (active == "example-green") {
-      dest = "example-blue"
+    if (active == "production") {
+      dest = "devops"
      
     }
     echo "Active svc: " + active
