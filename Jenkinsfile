@@ -7,7 +7,7 @@ node {
   // -------------------------------------
   //def rollback = ""
   def project  = ""
-  def dest     = "production"
+  def dest     = "green"
   def active   = ""
   def newcolor = ""
 
@@ -48,12 +48,12 @@ node {
     // Determine current project
     sh "oc get project|grep -v NAME|awk '{print \$1}' >project.txt"
     project = readFile('project.txt').trim()
-    sh "oc get route production -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+    sh "oc get route green -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
 
     // Determine currently active Service
     active = readFile('activesvc.txt').trim()
-    if (active == "production") {
-      dest = "devops"
+    if (active == "green") {
+      dest = "green"
      
     }
     echo "Active svc: " + active
