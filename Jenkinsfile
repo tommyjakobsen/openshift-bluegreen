@@ -16,7 +16,7 @@ node {
         newcolor="red"
         break
     case 2:
-        newcolor="maroon"
+        newcolor="yellow"
         break
     case 3:
         newcolor="navy"
@@ -79,10 +79,10 @@ node {
   }
   stage('Switch over to new Version') {
     input "Switch "+newcolor+" version into Production?"
-    sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
     sh 'oc get route production > oc_out.txt'
-    sh 'oc get route devops > oc_out2.txt'
+    sh 'oc get route blue > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
     oc_out2 = readFile('oc_out2.txt')
     echo "Current route configuration production: " + oc_out
@@ -111,8 +111,8 @@ node {
         // do something else
         echo "Rollback initiated"
        sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-            sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-            sh 'oc get route devops > oc_out.txt'
+            sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+            sh 'oc get route blue > oc_out.txt'
             sh 'oc get route production > oc_out2.txt'
             oc_out = readFile('oc_out.txt')
             oc_out2 = readFile('oc_out2.txt')
