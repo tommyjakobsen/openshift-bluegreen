@@ -109,7 +109,7 @@ node {
         // do something
         echo "Deployment was successful"
         //RED-black deployment. Remove the devops pod....
-      sh "oc scale dc/${active} --replicas=1"
+      sh "oc scale dc/${active} --replicas=0"
     } else {
         // do something else
         echo "Rollback initiated"
@@ -121,6 +121,8 @@ node {
             oc_out2 = readFile('oc_out2.txt')
             echo "Current route configuration Production: " + oc_out2
             echo "Current route configuration devops: " + oc_out
+            //scale down
+            sh "oc scale dc/${dest} --replicas=0"
         currentBuild.result = 'FAILURE'
     } 
 }
