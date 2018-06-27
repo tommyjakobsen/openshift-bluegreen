@@ -56,6 +56,7 @@ node {
       dest = "green"
      
     }
+    
     echo "Active svc: " + active
     echo "Dest svc:   " + dest
     echo "New color:  " + newcolor
@@ -69,7 +70,7 @@ node {
     echo "Building ${dest}"
     sh "oc set env dc ${dest} COLOR=${newcolor}"
   }
-
+sh "oc scale dc/${dest} --replicas=1"
   stage('Deploy new Version') {
     echo "Deploying to ${dest}"
 
@@ -94,8 +95,8 @@ node {
   def userInput
 try {
     userInput = input(
-        id: 'Proceed1', message: 'Was this successful?', parameters: [
-        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
+        id: 'Proceed1', message: 'Was the deployment successful?', parameters: [
+        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Was the deployment successful?']
         ])
 } catch(err) { // input false
     def user = err.getCauses()[0].getUser()
@@ -107,6 +108,8 @@ node {
     if (userInput == true) {
         // do something
         echo "Deployment was successful"
+        //RED-black deployment. Remove the devops pod....
+      sh "oc scale dc/${active} --replicas=1"
     } else {
         // do something else
         echo "Rollback initiated"
