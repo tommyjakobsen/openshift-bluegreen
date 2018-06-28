@@ -78,19 +78,10 @@ sh "oc scale dc/${dest} --replicas=1"
     openshiftVerifyDeployment depCfg: dest, namespace: project, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: project, svcName: dest, verbose: 'false'
   }
-  stage('Switch over to new Version') {
+  stage('Canary new Version?') {
     input "Switch "+newcolor+" version into production?"
     sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc get route blue > oc_out.txt'
-    sh 'oc get route green > oc_out2.txt'
-    oc_out = readFile('oc_out.txt')
-    oc_out2 = readFile('oc_out2.txt')
-    echo "Current route configuration blue: " + oc_out
-     echo "Current route configuration green: " + oc_out
-    
-   
-  }
+      }
   stage('Keep version?') {
   def userInput
 try {
@@ -109,6 +100,13 @@ node {
         // do something
         echo "Deployment was successful"
         //RED-black deployment. Remove the devops pod....
+       sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc get route blue > oc_out.txt'
+    sh 'oc get route green > oc_out2.txt'
+    oc_out = readFile('oc_out.txt')
+    oc_out2 = readFile('oc_out2.txt')
+    echo "Current route configuration blue: " + oc_out
+     echo "Current route configuration green: " + oc_out
       sh "oc scale dc/${active} --replicas=0"
     } else {
         // do something else
