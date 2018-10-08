@@ -56,7 +56,6 @@ node {
       dest = "green"
      
     }
-    
     echo "Active svc: " + active
     echo "Dest svc:   " + dest
     echo "New color:  " + newcolor
@@ -70,7 +69,7 @@ node {
     echo "Building ${dest}"
     sh "oc set env dc ${dest} COLOR=${newcolor}"
   }
-sh "oc scale dc/${dest} --replicas=1"
+
   stage('Deploy new Version') {
     echo "Deploying to ${dest}"
 
@@ -78,16 +77,25 @@ sh "oc scale dc/${dest} --replicas=1"
     openshiftVerifyDeployment depCfg: dest, namespace: project, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: project, svcName: dest, verbose: 'false'
   }
-  stage('Canary new Version?') {
+  stage('Switch over to new Version') {
     input "Switch "+newcolor+" version into production?"
     sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-      }
+    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc get route blue > oc_out.txt'
+    sh 'oc get route green > oc_out2.txt'
+    oc_out = readFile('oc_out.txt')
+    oc_out2 = readFile('oc_out2.txt')
+    echo "Current route configuration blue: " + oc_out
+     echo "Current route configuration green: " + oc_out
+    
+   
+  }
   stage('Keep version?') {
   def userInput
 try {
     userInput = input(
-        id: 'Proceed1', message: 'Was the deployment successful?', parameters: [
-        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Was the deployment successful?']
+        id: 'Proceed1', message: 'Was this successful?', parameters: [
+        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
         ])
 } catch(err) { // input false
     def user = err.getCauses()[0].getUser()
@@ -99,15 +107,6 @@ node {
     if (userInput == true) {
         // do something
         echo "Deployment was successful"
-        //RED-black deployment. Remove the devops pod....
-       sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc get route blue > oc_out.txt'
-    sh 'oc get route green > oc_out2.txt'
-    oc_out = readFile('oc_out.txt')
-    oc_out2 = readFile('oc_out2.txt')
-    echo "Current route configuration blue: " + oc_out
-     echo "Current route configuration green: " + oc_out
-      sh "oc scale dc/${active} --replicas=0"
     } else {
         // do something else
         echo "Rollback initiated"
@@ -119,8 +118,6 @@ node {
             oc_out2 = readFile('oc_out2.txt')
             echo "Current route configuration Production: " + oc_out2
             echo "Current route configuration devops: " + oc_out
-            //scale down
-            sh "oc scale dc/${dest} --replicas=0"
         currentBuild.result = 'FAILURE'
     } 
 }
