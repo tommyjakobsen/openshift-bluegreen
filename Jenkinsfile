@@ -7,7 +7,7 @@ node {
   // -------------------------------------
   //def rollback = ""
   def project  = ""
-  def dest     = "blue"
+  def dest     = "production"
   def active   = ""
   def newcolor = ""
 
@@ -48,12 +48,12 @@ node {
     // Determine current project
     sh "oc get project|grep -v NAME|awk '{print \$1}' >project.txt"
     project = readFile('project.txt').trim()
-    sh "oc get route blue -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+    sh "oc get route production -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
 
     // Determine currently active Service
     active = readFile('activesvc.txt').trim()
-    if (active == "blue") {
-      dest = "green"
+    if (active == "production") {
+      dest = "devops"
      
     }
     echo "Active svc: " + active
@@ -78,15 +78,15 @@ node {
     openshiftVerifyService namespace: project, svcName: dest, verbose: 'false'
   }
   stage('Switch over to new Version') {
-    input "Switch "+newcolor+" version into production?"
-    sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc get route blue > oc_out.txt'
-    sh 'oc get route green > oc_out2.txt'
+    input "Switch "+newcolor+" version into Production?"
+    sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc get route production > oc_out.txt'
+    sh 'oc get route devops > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
     oc_out2 = readFile('oc_out2.txt')
-    echo "Current route configuration blue: " + oc_out
-     echo "Current route configuration green: " + oc_out
+    echo "Current route configuration production: " + oc_out
+     echo "Current route configuration devops: " + oc_out
     
    
   }
@@ -110,10 +110,10 @@ node {
     } else {
         // do something else
         echo "Rollback initiated"
-       sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-            sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-            sh 'oc get route green > oc_out.txt'
-            sh 'oc get route blue > oc_out2.txt'
+       sh 'oc patch route production -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+            sh 'oc patch route devops -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+            sh 'oc get route devops > oc_out.txt'
+            sh 'oc get route production > oc_out2.txt'
             oc_out = readFile('oc_out.txt')
             oc_out2 = readFile('oc_out2.txt')
             echo "Current route configuration Production: " + oc_out2
