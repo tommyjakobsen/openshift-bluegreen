@@ -3,11 +3,11 @@ import java.text.SimpleDateFormat;
 // This pipeline expects a paramater newcolor which will set the newcolor of the newly deployed application.
 
 node {
-  // green/blue Deployment into Production
+  // Blue/Green Deployment into Production
   // -------------------------------------
   //def rollback = ""
   def project  = ""
-  def dest     = "green"
+  def dest     = "blue"
   def active   = ""
   def newcolor = ""
 
@@ -40,7 +40,7 @@ node {
         newcolor="red"
         break
     case 0:
-        newcolor="green"
+        newcolor="blue"
         break
   }
 
@@ -48,12 +48,12 @@ node {
     // Determine current project
     sh "oc get project|grep -v NAME|awk '{print \$1}' >project.txt"
     project = readFile('project.txt').trim()
-    sh "oc get route green -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
+    sh "oc get route blue -n ${project} -o jsonpath='{ .spec.to.name }' > activesvc.txt"
 
     // Determine currently active Service
     active = readFile('activesvc.txt').trim()
-    if (active == "green") {
-      dest = "blue"
+    if (active == "blue") {
+      dest = "green"
      
     }
     echo "Active svc: " + active
@@ -79,14 +79,14 @@ node {
   }
   stage('Switch over to new Version') {
     input "Switch "+newcolor+" version into Production?"
-    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-    sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-    sh 'oc get route green > oc_out.txt'
-    sh 'oc get route blue > oc_out2.txt'
+    sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+    sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+    sh 'oc get route blue > oc_out.txt'
+    sh 'oc get route green > oc_out2.txt'
     oc_out = readFile('oc_out.txt')
     oc_out2 = readFile('oc_out2.txt')
     echo "Current route configuration Production: " + oc_out
-     echo "Current route configuration blue: " + oc_out
+     echo "Current route configuration green: " + oc_out
     
    
   }
@@ -110,10 +110,10 @@ node {
     } else {
         // do something else
         echo "Rollback initiated"
-       sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
-            sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
-            sh 'oc get route blue > oc_out.txt'
-            sh 'oc get route green > oc_out2.txt'
+       sh 'oc patch route blue -p \'{"spec":{"to":{"name":"' + active + '"}}}\''
+            sh 'oc patch route green -p \'{"spec":{"to":{"name":"' + dest + '"}}}\''
+            sh 'oc get route green > oc_out.txt'
+            sh 'oc get route blue > oc_out2.txt'
             oc_out = readFile('oc_out.txt')
             oc_out2 = readFile('oc_out2.txt')
             echo "Current route configuration Production: " + oc_out2
